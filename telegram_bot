@@ -1,0 +1,57 @@
+import cv2
+import os
+import logging
+from telegram import Update
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+import time
+
+TOKEN = "BURAYA KENDİ TOKENİZİ GİRİNİZ"  
+
+def record_video(filename="kamera_kaydi.mp4", duration=5, fps=20):
+    cap = cv2.VideoCapture(0)  
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    width = int(cap.get(3))
+    height = int(cap.get(4))
+    out = cv2.VideoWriter(filename, fourcc, fps, (width, height))
+
+    start_time = time.time()
+
+    while int(time.time() - start_time) < duration:
+        ret, frame = cap.read()
+        if ret:
+            out.write(frame)
+
+    cap.release()
+    out.release()
+
+def take_photo(filename="kamera_fotografi.jpg"):
+    cap = cv2.VideoCapture(0)  
+    ret, frame = cap.read()
+    if ret:
+        cv2.imwrite(filename, frame)
+    cap.release()
+
+async def video(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Video kaydı başlatılıyor...")
+    record_video()
+    chat_id = update.effective_chat.id
+    with open("kamera_kaydi.mp4", "rb") as video:
+        await context.bot.send_video(chat_id=chat_id, video=video, supports_streaming=True)
+    await update.message.reply_text("Video gönderildi.")
+
+async def foto(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("📸 Fotoğraf çekiliyor...")
+    take_photo()
+    chat_id = update.effective_chat.id
+    with open("kamera_fotografi.jpg", "rb") as photo:
+        await context.bot.send_photo(chat_id=chat_id, photo=photo)
+    await update.message.reply_text("Fotoğraf gönderildi.")
+
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+
+if __name__ == '__main__':
+    app = ApplicationBuilder().token(TOKEN).build()
+    app.add_handler(CommandHandler("video", video))
+    app.add_handler(CommandHandler("foto", foto))
+    print("Bot çalışıyor...")
+    app.run_polling()
