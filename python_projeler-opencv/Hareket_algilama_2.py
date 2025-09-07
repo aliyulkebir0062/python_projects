@@ -6,7 +6,7 @@ import time
 # Uyarı sesinin ayarları
 frekans = 900
 süre = 1000
-ses_cikarma_suresi = 15  # Ses çıkarma süresi (saniye)
+ses_cikarma_suresi = 15  # Ses çıkarma süresi
 
 output_file = 'kayit4.mp4'
 fps = 25  # Video çerçeve hızı
@@ -23,10 +23,9 @@ prev_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 motion_detected = False
 start_time = time.time()
 
-# Metin konuşma motorunu başlat
+#Metin konuşma motorunu başlat
 engine = pyttsx3.init()
 
-# Türkçe karakter
 engine.setProperty('voice', 'tr')  # Türkçe ses kullanımı
 engine.setProperty('encoding', 'utf-8')
 
@@ -57,7 +56,7 @@ while True:
             out.write(frame)
             motion_detected = False
             # print("Hareket algılandı!")
-            engine.say("Hareket algılandı!")  # Sesli uyarı
+            engine.say("Hareket algılandı!") 
             engine.runAndWait()
             start_time = time.time()
 
